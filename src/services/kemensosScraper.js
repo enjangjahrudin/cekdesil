@@ -1,23 +1,30 @@
 const cheerio = require('cheerio');
 const { solveCaptcha } = require('./captchaSolver');
 const { ProxyAgent } = require('undici');
+const licenseService = require('./licenseService');
 
 const BASE_URL = 'https://cekbansos.kemensos.go.id';
 
+let currentProxyUrl = null;
 let cachedDispatcher = null;
+
 function getProxyDispatcher() {
-  if (cachedDispatcher !== null) return cachedDispatcher;
-  const proxyUrl = process.env.PROXY_URL || process.env.WARP_PROXY;
-  if (proxyUrl) {
-    try {
-      cachedDispatcher = new ProxyAgent(proxyUrl);
-      console.log(`🌐 Menggunakan Outbound Proxy Kemensos: ${proxyUrl}`);
-      return cachedDispatcher;
-    } catch (e) {
-      console.warn('⚠️ Gagal inisialisasi ProxyAgent:', e.message);
+  const activeProxy = licenseService.getProxyUrl();
+  if (activeProxy !== currentProxyUrl) {
+    currentProxyUrl = activeProxy;
+    if (activeProxy) {
+      try {
+        cachedDispatcher = new ProxyAgent(activeProxy);
+        console.log(`🌐 Outbound Proxy Kemensos Diaktifkan: ${activeProxy.replace(/:([^:@]+)@/, ':****@')}`);
+      } catch (e) {
+        console.warn('⚠️ Gagal inisialisasi ProxyAgent:', e.message);
+        cachedDispatcher = undefined;
+      }
+    } else {
+      cachedDispatcher = undefined;
     }
   }
-  return undefined;
+  return cachedDispatcher;
 }
 
 /**

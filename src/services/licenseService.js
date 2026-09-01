@@ -272,6 +272,34 @@ class LicenseService {
     // Must match the exact activeSessionToken
     return lic.activeSessionToken === sessionToken;
   }
+
+  getSettings() {
+    initAdmin();
+    try {
+      const raw = fs.readFileSync(ADMIN_FILE, 'utf8');
+      const data = JSON.parse(raw);
+      return {
+        proxyUrl: data.proxyUrl || '',
+        updatedAt: data.updatedAt || new Date().toISOString()
+      };
+    } catch (e) {
+      return { proxyUrl: '' };
+    }
+  }
+
+  updateSettings({ proxyUrl }) {
+    initAdmin();
+    const raw = fs.readFileSync(ADMIN_FILE, 'utf8');
+    const data = JSON.parse(raw);
+    data.proxyUrl = String(proxyUrl || '').trim();
+    data.updatedAt = new Date().toISOString();
+    fs.writeFileSync(ADMIN_FILE, JSON.stringify(data, null, 2));
+    return this.getSettings();
+  }
+
+  getProxyUrl() {
+    return this.getSettings().proxyUrl || process.env.PROXY_URL || process.env.WARP_PROXY || '';
+  }
 }
 
 module.exports = new LicenseService();

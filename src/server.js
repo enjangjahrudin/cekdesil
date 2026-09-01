@@ -241,6 +241,68 @@ app.post('/api/admin/change-pin', requireAdminAuth, (req, res) => {
   }
 });
 
+// Get Proxy & System Settings (Admin Only)
+app.get('/api/admin/settings', requireAdminAuth, (req, res) => {
+  try {
+    const settings = licenseService.getSettings();
+    res.json({ success: true, settings });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Update Proxy Settings (Admin Only)
+app.post('/api/admin/settings', requireAdminAuth, (req, res) => {
+  try {
+    const { proxyUrl } = req.body;
+    const updated = licenseService.updateSettings({ proxyUrl });
+    res.json({ success: true, settings: updated });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Test Proxy Connection directly to Kemensos (Admin Only)
+app.post('/api/admin/test-proxy', requireAdminAuth, async (req, res) => {
+  try {
+    const { proxyUrl } = req.body;
+    const targetUrl = 'https://cekbansos.kemensos.go.id/';
+    const startTime = Date.now();
+
+    const fetchOptions = {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
+      }
+    };
+
+    if (proxyUrl && proxyUrl.trim()) {
+      const { ProxyAgent } = require('undici');
+      fetchOptions.dispatcher = new ProxyAgent(proxyUrl.trim());
+    }
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 12000);
+    fetchOptions.signal = controller.signal;
+
+    const response = await fetch(targetUrl, fetchOptions);
+    clearTimeout(timeout);
+    const latencyMs = Date.now() - startTime;
+
+    res.json({
+      success: true,
+      statusCode: response.status,
+      statusText: response.statusText,
+      latencyMs,
+      message: `Berhasil terhubung ke server Kemensos! (Status: ${response.status}, Latensi: ${latencyMs}ms)`
+    });
+  } catch (err) {
+    res.status(400).json({
+      success: false,
+      error: `Gagal terhubung ke Kemensos via proxy: ${err.message}`
+    });
+  }
+});
+
 // ==========================================
 // 🚀 PROTECTED APPLICATION ROUTES
 // ==========================================
