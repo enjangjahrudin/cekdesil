@@ -19,7 +19,7 @@
     "isActive": true,
     "createdAt": "2026-09-01T12:29:38.208Z",
     "notes": "Pembelian Lisensi BuatDigital.id",
-    "activeSessionToken": "d8aa54b658d07dd74969a3267280f7eae20d877dfbde8e3b32bd580cae93e131",
+    "activeSessionToken": null,
     "lastLoginAt": "2026-09-01T16:13:40.816Z",
     "lastDeviceInfo": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36 Edg/151.0.0.0",
     "lastIp": "::1",
