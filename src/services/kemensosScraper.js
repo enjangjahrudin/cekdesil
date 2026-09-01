@@ -1,7 +1,24 @@
 const cheerio = require('cheerio');
 const { solveCaptcha } = require('./captchaSolver');
+const { ProxyAgent } = require('undici');
 
 const BASE_URL = 'https://cekbansos.kemensos.go.id';
+
+let cachedDispatcher = null;
+function getProxyDispatcher() {
+  if (cachedDispatcher !== null) return cachedDispatcher;
+  const proxyUrl = process.env.PROXY_URL || process.env.WARP_PROXY;
+  if (proxyUrl) {
+    try {
+      cachedDispatcher = new ProxyAgent(proxyUrl);
+      console.log(`🌐 Menggunakan Outbound Proxy Kemensos: ${proxyUrl}`);
+      return cachedDispatcher;
+    } catch (e) {
+      console.warn('⚠️ Gagal inisialisasi ProxyAgent:', e.message);
+    }
+  }
+  return undefined;
+}
 
 /**
  * Cookie Manager Helper
@@ -101,13 +118,13 @@ function parseResultHtml(html, nik) {
       pbiPeriode: '-',
       pbiKeterangan: '-',
       kpdStatus: 'TIDAK',
-      rawText: 'Data NIK tidak ditemukan dalam DTSEN / Kemensos'
+      rawText: 'Data NIK tidak ditemukan di database Kemensos'
     };
   }
 
   // Fallback
   return {
-    status: 'Tidak Ditemukan',
+    status: 'Tidak Ada Data',
     dtsenPeriod,
     namaMasked: '-',
     desil: 'Tidak Terdaftar',
@@ -126,11 +143,16 @@ function parseResultHtml(html, nik) {
 /**
  * Safe fetch with timeout to prevent hanging on slow Kemensos responses
  */
-async function fetchWithTimeout(url, options = {}, timeoutMs = 8000) {
+async function fetchWithTimeout(url, options = {}, timeoutMs = 10000) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    const res = await fetch(url, { ...options, signal: controller.signal });
+    const fetchOptions = { ...options, signal: controller.signal };
+    const dispatcher = getProxyDispatcher();
+    if (dispatcher) {
+      fetchOptions.dispatcher = dispatcher;
+    }
+    const res = await fetch(url, fetchOptions);
     clearTimeout(timer);
     return res;
   } catch (err) {
