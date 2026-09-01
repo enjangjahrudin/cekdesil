@@ -16,41 +16,55 @@
 
   <!-- Navigation Bar -->
   <header class="bg-blue-900 text-white shadow-md sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      <div class="flex items-center space-x-3">
-        <img src="favicon.svg" alt="Logo" class="w-10 h-10 rounded-xl shadow-sm border border-blue-400/30">
-        <div>
-          <div class="flex items-center gap-2">
-            <h1 class="text-lg font-bold tracking-tight">Cek Desil Massal DTSEN</h1>
-            <span class="bg-blue-800/80 text-[11px] text-blue-200 px-2 py-0.5 rounded border border-blue-700/60 font-medium">
-              by <a href="https://buatdigital.id" target="_blank" class="text-blue-300 font-bold hover:underline">BuatDigital.id</a>
-            </span>
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5 sm:py-0 sm:h-16 flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4">
+      
+      <!-- Brand & Title -->
+      <div class="flex items-center justify-between sm:justify-start space-x-2.5 min-w-0">
+        <div class="flex items-center space-x-2.5 min-w-0">
+          <img src="favicon.svg" alt="Logo" class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl shadow-sm border border-blue-400/30 flex-shrink-0">
+          <div class="min-w-0">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <h1 class="text-sm sm:text-base font-black tracking-tight text-white truncate">Cek Desil Massal DTSEN</h1>
+              <span class="bg-blue-950/80 text-[10px] text-blue-300 px-1.5 py-0.5 rounded border border-blue-700/60 font-semibold flex-shrink-0">
+                by <a href="https://buatdigital.id" target="_blank" class="text-blue-300 font-bold hover:underline">BuatDigital.id</a>
+              </span>
+            </div>
+            <p class="text-[10px] sm:text-xs text-blue-200 truncate">Kemensos RI &bull; DTSEN</p>
           </div>
-          <p class="text-xs text-blue-200">Data Tunggal Sosial dan Ekonomi Nasional - Kemensos RI</p>
+        </div>
+
+        <!-- Mobile Quick Logout (Only visible on tiny screens if needed) -->
+        <div class="flex sm:hidden items-center gap-1.5">
+          <button onclick="userLogout()" title="Logout" class="p-1.5 rounded-lg bg-rose-600/30 text-rose-200 hover:text-white border border-rose-500/40 text-xs">
+            <i class="fa-solid fa-power-off"></i>
+          </button>
         </div>
       </div>
-      <div class="flex items-center space-x-3 text-xs">
-        <div id="userAccountInfo" class="flex items-center gap-2 bg-blue-950/60 px-3 py-1.5 rounded-xl border border-blue-800/80">
-          <i class="fa-solid fa-circle-user text-blue-300 text-sm"></i>
-          <span id="userEmailBadge" class="font-medium text-slate-200">user@email.com</span>
+
+      <!-- User Account & Actions -->
+      <div class="hidden sm:flex items-center space-x-2.5 text-xs flex-shrink-0">
+        <div id="userAccountInfo" class="flex items-center gap-2 bg-blue-950/70 px-3 py-1.5 rounded-xl border border-blue-800/80 max-w-[200px] lg:max-w-none">
+          <i class="fa-solid fa-circle-user text-blue-300 text-sm flex-shrink-0"></i>
+          <span id="userEmailBadge" class="font-medium text-slate-200 truncate">user@email.com</span>
         </div>
-        <button onclick="userLogout()" title="Logout dari perangkat ini" class="px-3 py-1.5 rounded-lg bg-blue-800/60 hover:bg-rose-600/80 text-blue-200 hover:text-white border border-blue-700/60 hover:border-rose-500 transition-all flex items-center gap-1.5 font-medium">
-          <i class="fa-solid fa-power-off"></i> <span>Keluar</span>
+        <button onclick="userLogout()" title="Logout dari perangkat ini" class="px-3 py-1.5 rounded-xl bg-blue-800/60 hover:bg-rose-600/80 text-blue-200 hover:text-white border border-blue-700/60 hover:border-rose-500 transition-all flex items-center gap-1.5 font-medium flex-shrink-0">
+          <i class="fa-solid fa-power-off text-xs"></i> <span>Keluar</span>
         </button>
       </div>
+
     </div>
   </header>
 
   <!-- Main Container -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-6">
+  <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 flex-1 w-full space-y-5 sm:space-y-6">
 
     <!-- Tab Selection -->
-    <div class="flex border-b border-slate-200">
-      <button id="tabBatchBtn" onclick="switchTab('batch')" class="py-3 px-6 text-sm font-semibold border-b-2 border-blue-700 text-blue-700 flex items-center gap-2">
-        <i class="fa-solid fa-file-excel"></i> Pengecekan Massal (Excel)
+    <div class="flex border-b border-slate-200 overflow-x-auto no-scrollbar">
+      <button id="tabBatchBtn" onclick="switchTab('batch')" class="py-2.5 sm:py-3 px-4 sm:px-6 text-xs sm:text-sm font-bold border-b-2 border-blue-700 text-blue-700 flex items-center gap-2 whitespace-nowrap">
+        <i class="fa-solid fa-file-excel text-emerald-600"></i> Pengecekan Massal (Excel)
       </button>
-      <button id="tabSingleBtn" onclick="switchTab('single')" class="py-3 px-6 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center gap-2">
-        <i class="fa-solid fa-id-card"></i> Cek Satuan (1 NIK)
+      <button id="tabSingleBtn" onclick="switchTab('single')" class="py-2.5 sm:py-3 px-4 sm:px-6 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center gap-2 whitespace-nowrap">
+        <i class="fa-solid fa-id-card text-blue-600"></i> Cek Satuan (1 NIK)
       </button>
     </div>
 
