@@ -28,7 +28,7 @@ const { parseUploadedExcel, generateTemplateExcel, generateResultExcel } = requi
 const { checkNik } = require('./services/kemensosScraper');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3003;
 
 app.disable('x-powered-by');
 
