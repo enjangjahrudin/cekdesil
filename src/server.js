@@ -35,26 +35,47 @@ app.disable('x-powered-by');
 app.use(
   helmet({
     contentSecurityPolicy: false,
-    crossOriginEmbedderPolicy: false
+    crossOriginEmbedderPolicy: false,
+    referrerPolicy: { policy: 'strict-origin-when-cross-origin' }
   })
 );
 
-// Setup upload storage in memory
+// Setup upload storage in memory with size limit
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
+  limits: { fileSize: 15 * 1024 * 1024 } // 15MB limit
 });
 
 app.use(cors());
-app.use(express.json({ limit: '5mb' }));
-app.use(express.urlencoded({ extended: true, limit: '5mb' }));
+app.use(express.json({ limit: '2mb' }));
+app.use(express.urlencoded({ extended: true, limit: '2mb' }));
 app.use(express.static(path.join(__dirname, '../public')));
 
-// Rate Limiter
+// ==========================================
+// 🛡️ SECURITY RATE LIMITERS
+// ==========================================
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 20,
-  message: { error: 'Terlalu banyak percobaan login. Silakan tunggu beberapa menit.' }
+  max: 15,
+  message: { error: 'Terlalu banyak percobaan login. Silakan tunggu 15 menit demi keamanan.' }
+});
+
+const adminPinLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 8,
+  message: { error: 'Terlalu banyak percobaan PIN Admin salah. Akses dibekukan selama 15 menit.' }
+});
+
+const singleCheckLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 100,
+  message: { error: 'Batas laju pengecekan satuan tercapai. Silakan coba sesaat lagi.' }
+});
+
+const uploadLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 40,
+  message: { error: 'Terlalu banyak unggahan file. Silakan tunggu beberapa saat.' }
 });
 
 // Convenient clean URL routes
@@ -129,8 +150,8 @@ app.get('/api/auth/check', (req, res) => {
 // 🛡️ ADMIN MANAGEMENT ROUTES
 // ==========================================
 
-// Admin Login (PIN Authentication)
-app.post('/api/admin/login', authLimiter, (req, res) => {
+// Admin Login (PIN Authentication with Brute-Force Protection)
+app.post('/api/admin/login', adminPinLimiter, (req, res) => {
   try {
     const { pin } = req.body;
     if (!pin) {
@@ -229,11 +250,22 @@ app.get('/api/events', requireLicenseAuth, (req, res) => {
   });
 });
 
-// Upload Excel File (Protected)
-app.post('/api/upload', requireLicenseAuth, upload.single('file'), async (req, res) => {
+// Upload Excel File (Protected + Rate-limited)
+app.post('/api/upload', requireLicenseAuth, uploadLimiter, upload.single('file'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'Tidak ada file yang diunggah.' });
+    }
+
+    // Validate file mimetype
+    const validMimes = [
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.ms-excel',
+      'text/csv',
+      'application/octet-stream'
+    ];
+    if (!validMimes.includes(req.file.mimetype) && !req.file.originalname.match(/\.(xlsx|xls|csv)$/i)) {
+      return res.status(400).json({ error: 'Format file tidak didukung. Harap unggah file .xlsx, .xls, atau .csv.' });
     }
 
     const items = await parseUploadedExcel(req.file.buffer);
@@ -291,14 +323,21 @@ app.post('/api/config', requireLicenseAuth, (req, res) => {
   res.json({ success: true, delayMs: queueManager.delayMs });
 });
 
-// Check Single NIK (Instant Test) (Protected)
-app.post('/api/check-single', requireLicenseAuth, async (req, res) => {
+// Check Single NIK (Instant Test) (Protected + Rate-limited)
+app.post('/api/check-single', requireLicenseAuth, singleCheckLimiter, async (req, res) => {
   try {
     const { nik } = req.body;
     if (!nik) {
       return res.status(400).json({ error: 'NIK wajib diisi.' });
     }
-    const result = await checkNik(nik);
+    
+    // Strict Sanitization: Extract digits only
+    const cleanNik = String(nik).trim().replace(/\D/g, '');
+    if (cleanNik.length !== 16) {
+      return res.status(400).json({ error: 'Format NIK tidak valid. NIK harus terdiri dari tepat 16 digit angka.' });
+    }
+
+    const result = await checkNik(cleanNik);
     res.json(result);
   } catch (err) {
     console.error('Check Single Error:', err);
