@@ -1,3 +1,19 @@
+// Polyfill global File for Node.js 18 undici compatibility
+if (typeof globalThis.File === 'undefined') {
+  const { Blob } = require('buffer');
+  class File extends Blob {
+    constructor(chunks, filename, options = {}) {
+      super(chunks, options);
+      this.name = String(filename);
+      this.lastModified = options.lastModified || Date.now();
+    }
+    get [Symbol.toStringTag]() {
+      return 'File';
+    }
+  }
+  globalThis.File = File;
+}
+
 const express = require('express');
 const multer = require('multer');
 const cors = require('cors');
