@@ -26,6 +26,7 @@ const licenseService = require('./services/licenseService');
 const { requireLicenseAuth, requireAdminAuth } = require('./middleware/authMiddleware');
 const { parseUploadedExcel, generateTemplateExcel, generateResultExcel } = require('./services/excelService');
 const { checkNik } = require('./services/kemensosScraper');
+const { getWorker } = require('./services/captchaSolver');
 
 const app = express();
 const PORT = process.env.PORT || 3003;
@@ -380,7 +381,9 @@ app.listen(PORT, () => {
   console.log(`====================================================`);
   console.log(`  🚀 Aplikasi Cek Desil Massal Kemensos Aktif!`);
   console.log(`  🏢 Developed by BuatDigital.id`);
-  console.log(`  🌐 Akses Web: http://localhost:${PORT}`);
-  console.log(`  🔐 Panel Admin: http://localhost:${PORT}/admin`);
+  console.log(`  🌐 Port: ${PORT}`);
   console.log(`====================================================`);
+  
+  // Warm up OCR worker immediately so first check is super fast
+  getWorker().catch(e => console.error('OCR Warmup Notice:', e.message));
 });

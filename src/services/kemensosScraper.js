@@ -124,6 +124,25 @@ function parseResultHtml(html, nik) {
 }
 
 /**
+ * Safe fetch with timeout to prevent hanging on slow Kemensos responses
+ */
+async function fetchWithTimeout(url, options = {}, timeoutMs = 8000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, { ...options, signal: controller.signal });
+    clearTimeout(timer);
+    return res;
+  } catch (err) {
+    clearTimeout(timer);
+    if (err.name === 'AbortError') {
+      throw new Error(`Timeout menghubungi server Kemensos (${timeoutMs}ms)`);
+    }
+    throw err;
+  }
+}
+
+/**
  * Check single NIK on Kemensos website with automatic captcha retry
  * @param {string} nik 
  * @param {number} maxRetries 
@@ -157,12 +176,12 @@ async function checkNik(nik, maxRetries = 35) {
       const jar = new CookieJar();
 
       // 1. Get initial session and CSRF token
-      const res1 = await fetch(`${BASE_URL}/`, {
+      const res1 = await fetchWithTimeout(`${BASE_URL}/`, {
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
           'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
         }
-      });
+      }, 7000);
       jar.updateFromResponse(res1);
 
       const html1 = await res1.text();
@@ -175,13 +194,13 @@ async function checkNik(nik, maxRetries = 35) {
 
       // 2. Fetch captcha image with current cookies and update session
       const captchaUrl = `${BASE_URL}/captcha/flat?${Math.random()}`;
-      const res2 = await fetch(captchaUrl, {
+      const res2 = await fetchWithTimeout(captchaUrl, {
         headers: {
           'Cookie': jar.getHeader(),
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
           'Referer': `${BASE_URL}/`
         }
-      });
+      }, 7000);
       jar.updateFromResponse(res2);
 
       const captchaBuffer = Buffer.from(await res2.arrayBuffer());
@@ -189,7 +208,7 @@ async function checkNik(nik, maxRetries = 35) {
       // 3. Solve captcha via OCR
       const captchaText = await solveCaptcha(captchaBuffer);
       if (!captchaText || captchaText.length < 3) {
-        await new Promise(r => setTimeout(r, 300));
+        await new Promise(r => setTimeout(r, 200));
         continue;
       }
 
@@ -200,7 +219,7 @@ async function checkNik(nik, maxRetries = 35) {
       bodyParams.append('captcha', captchaText);
       bodyParams.append('ippub_client', '');
 
-      const postRes = await fetch(`${BASE_URL}/cekbansos_nik`, {
+      const postRes = await fetchWithTimeout(`${BASE_URL}/cekbansos_nik`, {
         method: 'POST',
         headers: {
           'Cookie': jar.getHeader(),
@@ -210,7 +229,7 @@ async function checkNik(nik, maxRetries = 35) {
           'Origin': BASE_URL
         },
         body: bodyParams.toString()
-      });
+      }, 9000);
       jar.updateFromResponse(postRes);
 
       const responseHtml = await postRes.text();
@@ -223,7 +242,7 @@ async function checkNik(nik, maxRetries = 35) {
         responseHtml.includes('captcha tidak valid')
       ) {
         // Captcha was wrong, retry with fresh session
-        await new Promise(r => setTimeout(r, 400));
+        await new Promise(r => setTimeout(r, 300));
         continue;
       }
 
@@ -237,8 +256,7 @@ async function checkNik(nik, maxRetries = 35) {
       };
 
     } catch (err) {
-      console.error(`Attempt ${attempt} error for NIK ${cleanNik}:`, err.message);
-      await new Promise(r => setTimeout(r, 600));
+      console.warn(`[Attempt ${attempt}/${maxRetries}] NIK ${cleanNik}: ${err.message}`);
       if (attempt >= maxRetries) {
         return {
           success: false,
@@ -256,6 +274,7 @@ async function checkNik(nik, maxRetries = 35) {
           kpdStatus: '-'
         };
       }
+      await new Promise(r => setTimeout(r, 400));
     }
   }
 

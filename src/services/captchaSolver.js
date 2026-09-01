@@ -1,20 +1,44 @@
+const path = require('path');
 const Jimp = require('jimp');
 const { createWorker, PSM } = require('tesseract.js');
 
 let worker = null;
+let initPromise = null;
 
 /**
- * Initialize or get cached Tesseract OCR Worker
+ * Initialize or get cached Tesseract OCR Worker (Optimized for VPS Offline Load)
  */
 async function getWorker() {
-  if (!worker) {
-    worker = await createWorker('eng');
-    await worker.setParameters({
-      tessedit_char_whitelist: 'abcdefghijklmnopqrstuvwxyz0123456789',
-      tessedit_pageseg_mode: PSM.SINGLE_WORD,
-    });
+  if (worker) return worker;
+  if (!initPromise) {
+    initPromise = (async () => {
+      const rootDir = path.resolve(__dirname, '../../');
+      try {
+        const w = await createWorker('eng', 1, {
+          langPath: rootDir,
+          gzip: false,
+          logger: () => {}
+        });
+        await w.setParameters({
+          tessedit_char_whitelist: 'abcdefghijklmnopqrstuvwxyz0123456789',
+          tessedit_pageseg_mode: PSM.SINGLE_WORD,
+        });
+        worker = w;
+        console.log('🤖 Tesseract OCR Worker Loaded (Local Model: eng.traineddata)');
+        return worker;
+      } catch (err) {
+        console.warn('⚠️ Gagal memuat local langPath, fallback online worker:', err.message);
+        const w = await createWorker('eng');
+        await w.setParameters({
+          tessedit_char_whitelist: 'abcdefghijklmnopqrstuvwxyz0123456789',
+          tessedit_pageseg_mode: PSM.SINGLE_WORD,
+        });
+        worker = w;
+        return worker;
+      }
+    })();
   }
-  return worker;
+  return initPromise;
 }
 
 /**
