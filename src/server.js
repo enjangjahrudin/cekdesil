@@ -14,6 +14,11 @@ if (typeof globalThis.File === 'undefined') {
   globalThis.File = File;
 }
 
+const dns = require('dns');
+if (dns.setDefaultResultOrder) {
+  dns.setDefaultResultOrder('ipv4first');
+}
+
 const express = require('express');
 const multer = require('multer');
 const cors = require('cors');
@@ -326,8 +331,8 @@ app.post('/api/config', requireLicenseAuth, (req, res) => {
 
 // Check Single NIK (Instant Test) (Protected + Rate-limited)
 app.post('/api/check-single', requireLicenseAuth, singleCheckLimiter, async (req, res) => {
+  const { nik } = req.body;
   try {
-    const { nik } = req.body;
     if (!nik) {
       return res.status(400).json({ error: 'NIK wajib diisi.' });
     }
@@ -338,10 +343,12 @@ app.post('/api/check-single', requireLicenseAuth, singleCheckLimiter, async (req
       return res.status(400).json({ error: 'Format NIK tidak valid. NIK harus terdiri dari tepat 16 digit angka.' });
     }
 
+    console.log(`🔍 [Cek Satuan] Memproses NIK: ${cleanNik} ...`);
     const result = await checkNik(cleanNik);
+    console.log(`✅ [Cek Satuan] Selesai NIK: ${cleanNik} -> Status: ${result.status}, Desil: ${result.desil}`);
     res.json(result);
   } catch (err) {
-    console.error('Check Single Error:', err);
+    console.error(`❌ [Cek Satuan] Error NIK: ${nik} ->`, err.message);
     res.status(500).json({ error: err.message });
   }
 });
