@@ -36,6 +36,9 @@ const { getWorker } = require('./services/captchaSolver');
 const app = express();
 const PORT = process.env.PORT || 3003;
 
+// Trust Nginx Reverse Proxy (fixes X-Forwarded-For warning)
+app.set('trust proxy', 1);
+
 app.disable('x-powered-by');
 
 // Permissive headers to ensure zero script blocking on mobile/extensions
