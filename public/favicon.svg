@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E3A8A" />
+      <stop offset="100%" stop-color="#0F172A" />
+    </linearGradient>
+
+    <!-- Tier Bar Gradients (Desil Levels) -->
+    <linearGradient id="tier1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#10B981" />
+      <stop offset="100%" stop-color="#34D399" />
+    </linearGradient>
+    <linearGradient id="tier2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#3B82F6" />
+      <stop offset="100%" stop-color="#60A5FA" />
+    </linearGradient>
+    <linearGradient id="tier3" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#F59E0B" />
+      <stop offset="100%" stop-color="#FBBF24" />
+    </linearGradient>
+
+    <!-- Glow Filter -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#10B981" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <!-- Rounded App Icon Background -->
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#bgGrad)" stroke="#3B82F6" stroke-width="1.5" />
+
+  <!-- ID Card / Document Shape -->
+  <rect x="12" y="12" width="40" height="40" rx="6" fill="#1E293B" stroke="#475569" stroke-width="1.2" />
+
+  <!-- Avatar Silhouette on ID Card -->
+  <circle cx="23" cy="23" r="4.5" fill="#94A3B8" />
+  <path d="M16 33 C16 29 19 28 23 28 C27 28 30 29 30 33 Z" fill="#94A3B8" />
+
+  <!-- Desil Tier Bars (Representation of 1-10 level indicators) -->
+  <rect x="33" y="19" width="13" height="3" rx="1.5" fill="url(#tier3)" />
+  <rect x="33" y="24" width="13" height="3" rx="1.5" fill="url(#tier2)" />
+  <rect x="33" y="29" width="13" height="3" rx="1.5" fill="url(#tier1)" />
+
+  <!-- Data Grid Dots at bottom -->
+  <circle cx="17" cy="42" r="1.5" fill="#64748B" />
+  <circle cx="22" cy="42" r="1.5" fill="#64748B" />
+  <circle cx="27" cy="42" r="1.5" fill="#64748B" />
+
+  <!-- Checkmark Badge on Bottom-Right -->
+  <circle cx="44" cy="42" r="9" fill="#10B981" filter="url(#glow)" stroke="#0F172A" stroke-width="1.5" />
+  <path d="M40.5 42 L43 44.5 L47.5 39.5" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+</svg>

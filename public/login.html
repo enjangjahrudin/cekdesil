@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aktivasi Lisensi - Cek Desil Massal DTSEN</title>
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <!-- Tailwind CSS & FontAwesome CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-slate-100 min-h-screen flex flex-col justify-between font-sans">
+
+  <!-- Header -->
+  <header class="p-6">
+    <div class="max-w-6xl mx-auto flex justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <img src="favicon.svg" alt="Logo" class="w-10 h-10 rounded-xl shadow-lg border border-blue-400/30">
+        <div>
+          <h1 class="text-base font-bold text-white tracking-tight">Cek Desil Massal DTSEN</h1>
+          <p class="text-xs text-blue-300">by BuatDigital.id</p>
+        </div>
+      </div>
+      <button onclick="openAdminModal()" class="text-xs text-slate-400 hover:text-blue-300 transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-700 hover:border-blue-500 bg-slate-800/60">
+        <i class="fa-solid fa-shield-halved text-blue-400"></i> Panel Admin
+      </button>
+    </div>
+  </header>
+
+  <!-- Login Main Content -->
+  <main class="flex-1 flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-white text-slate-800 rounded-3xl shadow-2xl p-8 border border-slate-100 space-y-6">
+
+      <div class="text-center space-y-2">
+        <div class="inline-flex p-3 rounded-2xl bg-blue-50 text-blue-600 mb-1 border border-blue-100 shadow-sm">
+          <i class="fa-solid fa-key text-2xl"></i>
+        </div>
+        <h2 class="text-xl font-bold text-slate-900">Akses Lisensi Aplikasi</h2>
+        <p class="text-xs text-slate-500">Masukkan email lisensi yang telah didaftarkan untuk masuk ke aplikasi Cek Desil Massal.</p>
+      </div>
+
+      <!-- Overridden alert notification -->
+      <div id="overriddenAlert" class="hidden p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 flex items-start gap-2.5">
+        <i class="fa-solid fa-circle-exclamation text-rose-500 text-sm mt-0.5 flex-shrink-0"></i>
+        <div>
+          <p class="font-bold">Sesi Anda Telah Berakhir</p>
+          <p class="text-[11px] text-rose-600 mt-0.5">Akun lisensi ini baru saja login di perangkat lain. Silakan login kembali jika ingin memindahkan akses ke perangkat ini.</p>
+        </div>
+      </div>
+
+      <!-- Error / Status message -->
+      <div id="loginMessage" class="hidden p-3 rounded-xl text-xs"></div>
+
+      <!-- Login Form -->
+      <form id="licenseLoginForm" onsubmit="handleLicenseLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1.5">Email Terdaftar (Lisensi):</label>
+          <div class="relative">
+            <i class="fa-solid fa-envelope absolute left-3.5 top-3.5 text-slate-400 text-xs"></i>
+            <input type="email" id="licenseEmailInput" required placeholder="nama@email.com" 
+                   class="w-full pl-9 pr-4 py-2.5 text-sm border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
+          </div>
+        </div>
+
+        <button type="submit" id="loginBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-xl text-sm flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all">
+          <i class="fa-solid fa-right-to-bracket"></i> Masuk ke Aplikasi
+        </button>
+      </form>
+
+      <!-- License Guarantee & Buy Info -->
+      <div class="pt-4 border-t border-slate-100 text-center space-y-3">
+        <div class="flex items-center justify-center gap-2 text-[11px] text-slate-500 font-medium">
+          <i class="fa-solid fa-lock text-emerald-600"></i> Proteksi 1 Perangkat Aktif &bull; Sekali Bayar
+        </div>
+        
+        <div class="bg-blue-50/70 p-3.5 rounded-2xl border border-blue-100 text-xs text-slate-600 space-y-1">
+          <p class="font-semibold text-blue-900">Belum memiliki Lisensi?</p>
+          <p class="text-[11px] text-slate-500">Dapatkan akses seumur hidup (sekali bayar) tanpa batasan cek NIK.</p>
+          <a href="https://buatdigital.id" target="_blank" class="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 hover:underline pt-1">
+            <i class="fa-solid fa-cart-shopping"></i> Hubungi / Beli di BuatDigital.id &rarr;
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Admin PIN Modal -->
+  <div id="adminModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="w-full max-w-sm bg-white rounded-3xl p-6 shadow-2xl space-y-4 border border-slate-100 text-slate-800">
+      <div class="flex justify-between items-center">
+        <h3 class="text-base font-bold flex items-center gap-2 text-slate-900">
+          <i class="fa-solid fa-shield-halved text-blue-600"></i> Login Panel Admin
+        </h3>
+        <button onclick="closeAdminModal()" class="text-slate-400 hover:text-slate-600 text-sm">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <p class="text-xs text-slate-500">Masukkan PIN Admin untuk mengelola data lisensi pengguna.</p>
+
+      <form id="adminLoginForm" onsubmit="handleAdminLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">PIN Admin:</label>
+          <div class="relative">
+            <i class="fa-solid fa-lock absolute left-3.5 top-3.5 text-slate-400 text-xs"></i>
+            <input type="password" id="adminPinInput" required placeholder="Masukkan PIN" 
+                   class="w-full pl-9 pr-4 py-2.5 text-sm border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600">
+          </div>
+          <p class="text-[10px] text-slate-400 mt-1">PIN Default Awal: <code class="bg-slate-100 px-1 py-0.5 rounded">admin123</code></p>
+        </div>
+
+        <div id="adminLoginMsg" class="hidden text-xs p-2 rounded-lg"></div>
+
+        <button type="submit" id="adminLoginBtn" class="w-full bg-slate-900 hover:bg-black text-white font-semibold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2">
+          <i class="fa-solid fa-unlock"></i> Masuk Panel Admin
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="p-6 text-center text-xs text-slate-400">
+    <p>&copy; 2026 Cek Desil Massal DTSEN &bull; Powered by <a href="https://buatdigital.id" target="_blank" class="text-blue-300 font-semibold hover:underline">BuatDigital.id</a></p>
+  </footer>
+
+  <script>
+    // Check if redirected because session overridden
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('reason') === 'overridden') {
+      document.getElementById('overriddenAlert').classList.remove('hidden');
+    }
+
+    // Auto redirect if already logged in
+    async function checkExistingAuth() {
+      const email = localStorage.getItem('licenseEmail');
+      const token = localStorage.getItem('sessionToken');
+      if (email && token && urlParams.get('reason') !== 'overridden') {
+        try {
+          const res = await fetch('/api/auth/check', {
+            headers: {
+              'x-license-email': email,
+              'x-session-token': token
+            }
+          });
+          const data = await res.json();
+          if (data.valid) {
+            window.location.href = '/';
+          }
+        } catch (err) {}
+      }
+    }
+    checkExistingAuth();
+
+    async function handleLicenseLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('licenseEmailInput').value.trim();
+      const btn = document.getElementById('loginBtn');
+      const msg = document.getElementById('loginMessage');
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memverifikasi Lisensi...';
+      msg.classList.add('hidden');
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || 'Gagal masuk.');
+        }
+
+        // Save session
+        localStorage.setItem('licenseEmail', data.license.email);
+        localStorage.setItem('licenseName', data.license.name);
+        localStorage.setItem('sessionToken', data.sessionToken);
+
+        msg.className = 'p-3 rounded-xl text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 block';
+        msg.innerHTML = '<i class="fa-solid fa-circle-check"></i> Lisensi valid! Membuka aplikasi...';
+
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 500);
+
+      } catch (err) {
+        msg.className = 'p-3 rounded-xl text-xs bg-rose-50 text-rose-700 border border-rose-200 block';
+        msg.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> ${err.message}`;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Masuk ke Aplikasi';
+      }
+    }
+
+    function openAdminModal() {
+      document.getElementById('adminModal').classList.remove('hidden');
+    }
+    function closeAdminModal() {
+      document.getElementById('adminModal').classList.add('hidden');
+    }
+
+    async function handleAdminLogin(e) {
+      e.preventDefault();
+      const pin = document.getElementById('adminPinInput').value;
+      const btn = document.getElementById('adminLoginBtn');
+      const msg = document.getElementById('adminLoginMsg');
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memeriksa...';
+      msg.classList.add('hidden');
+
+      try {
+        const res = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pin })
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || 'PIN Admin salah.');
+        }
+
+        localStorage.setItem('adminToken', data.token);
+        window.location.href = '/admin';
+
+      } catch (err) {
+        msg.className = 'text-xs p-2 rounded-lg bg-rose-50 text-rose-700 border border-rose-200 block';
+        msg.innerText = err.message;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-unlock"></i> Masuk Panel Admin';
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+[
+  {
+    "id": "c6b4ac44-1b44-4038-91d0-289557c6bd2b",
+    "email": "demo@buatdigital.id",
+    "name": "Demo Account BuatDigital",
+    "isActive": true,
+    "createdAt": "2026-09-01T10:25:26.434Z",
+    "notes": "Lisensi demo bawaan sistem",
+    "activeSessionToken": "6e436ac392dd54a80545c4a65148ab845b4d4b3f8b0fdb091d9cda6a10224dc9",
+    "lastLoginAt": "2026-09-01T10:26:24.021Z",
+    "lastDeviceInfo": "Device 2 Firefox",
+    "lastIp": "::1",
+    "loginCount": 2
+  },
+  {
+    "id": "a86cd2e5-f8f1-49f2-bd65-73ab582a9e72",
+    "email": "ejahrudin@gmail.com",
+    "name": "Enjang Jahrudin",
+    "isActive": true,
+    "createdAt": "2026-09-01T12:29:38.208Z",
+    "notes": "Pembelian Lisensi BuatDigital.id",
+    "activeSessionToken": "653f9e36cfe6f442609445f257f810db8382ae64f0b6bd0bd9e302d3c719ef31",
+    "lastLoginAt": "2026-09-01T12:30:13.511Z",
+    "lastDeviceInfo": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "lastIp": "::1",
+    "loginCount": 1
+  }
+]

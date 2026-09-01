@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Admin - Manajemen Lisensi BuatDigital.id</title>
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <!-- Tailwind CSS & FontAwesome CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col font-sans">
+
+  <!-- Navbar -->
+  <header class="bg-slate-900 text-white shadow-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <img src="favicon.svg" alt="Logo" class="w-9 h-9 rounded-xl border border-slate-700">
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base font-bold tracking-tight">Panel Admin Lisensi</h1>
+            <span class="bg-amber-500/20 text-amber-300 text-[10px] px-2 py-0.5 rounded font-bold border border-amber-500/30">Admin Area</span>
+          </div>
+          <p class="text-[11px] text-slate-400">BuatDigital.id License Manager</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-3 text-xs">
+        <button onclick="openChangePinModal()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-all flex items-center gap-1.5">
+          <i class="fa-solid fa-key text-amber-400"></i> Ganti PIN
+        </button>
+        <a href="/" class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium transition-all flex items-center gap-1.5">
+          <i class="fa-solid fa-arrow-left"></i> Buka Aplikasi
+        </a>
+        <button onclick="adminLogout()" class="px-3 py-1.5 rounded-lg bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/30 transition-all flex items-center gap-1.5">
+          <i class="fa-solid fa-power-off"></i> Logout
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-6">
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
+        <div>
+          <p class="text-xs font-semibold text-slate-500">Total Lisensi Terdaftar</p>
+          <p id="statTotalLicenses" class="text-2xl font-bold text-slate-900 mt-1">0</p>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 text-xl">
+          <i class="fa-solid fa-users"></i>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
+        <div>
+          <p class="text-xs font-semibold text-emerald-600">Lisensi Aktif</p>
+          <p id="statActiveLicenses" class="text-2xl font-bold text-emerald-700 mt-1">0</p>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 text-xl">
+          <i class="fa-solid fa-circle-check"></i>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
+        <div>
+          <p class="text-xs font-semibold text-blue-600">Device Sedang Online</p>
+          <p id="statOnlineDevices" class="text-2xl font-bold text-blue-700 mt-1">0</p>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 text-xl">
+          <i class="fa-solid fa-laptop-code"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add License Form Card -->
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+      <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+        <i class="fa-solid fa-user-plus text-blue-600"></i> Daftarkan Lisensi Pengguna Baru
+      </h2>
+      <p class="text-xs text-slate-500">Masukkan email pembeli yang telah melakukan pembayaran. Lisensi langsung aktif dan dapat digunakan di 1 perangkat.</p>
+
+      <form id="addLicenseForm" onsubmit="handleAddLicense(event)" class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Email Pengguna / Lisensi *</label>
+          <input type="email" id="newEmailInput" required placeholder="contoh: pembeli@gmail.com" 
+                 class="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Pembeli (Opsional)</label>
+          <input type="text" id="newNameInput" placeholder="Nama lengkap pembeli" 
+                 class="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Catatan / No. Invoice</label>
+          <div class="flex gap-2">
+            <input type="text" id="newNotesInput" placeholder="Contoh: Order #BD-102" 
+                   class="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600">
+            <button type="submit" id="addLicBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 whitespace-nowrap shadow-sm">
+              <i class="fa-solid fa-plus"></i> Tambah
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Licenses Table Card -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden space-y-4">
+      <div class="p-4 border-b border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-50/50">
+        <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+          <i class="fa-solid fa-table-list text-slate-600"></i> Daftar Seluruh Lisensi
+        </h3>
+        <div class="relative w-full sm:w-64">
+          <i class="fa-solid fa-search absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+          <input type="text" id="searchLicInput" oninput="renderLicensesTable()" placeholder="Cari email atau nama..." 
+                 class="w-full pl-8 pr-3 py-1.5 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600">
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-xs text-left text-slate-600">
+          <thead class="text-[11px] text-slate-700 uppercase bg-slate-100">
+            <tr>
+              <th class="px-4 py-3">Email Lisensi</th>
+              <th class="px-4 py-3">Nama Pembeli</th>
+              <th class="px-3 py-3 text-center">Status Akun</th>
+              <th class="px-3 py-3 text-center">Device Session</th>
+              <th class="px-4 py-3">Login Terakhir</th>
+              <th class="px-3 py-3 text-center">Total Login</th>
+              <th class="px-4 py-3 text-center">Aksi Manajemen</th>
+            </tr>
+          </thead>
+          <tbody id="licensesTableBody" class="divide-y divide-slate-100">
+            <tr>
+              <td colspan="7" class="text-center py-8 text-slate-400">
+                <i class="fa-solid fa-spinner fa-spin text-xl mb-2 block"></i> Memuat data lisensi...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Change PIN Modal -->
+  <div id="pinModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="w-full max-w-sm bg-white rounded-3xl p-6 shadow-2xl space-y-4 border border-slate-100 text-slate-800">
+      <div class="flex justify-between items-center">
+        <h3 class="text-base font-bold flex items-center gap-2 text-slate-900">
+          <i class="fa-solid fa-key text-amber-500"></i> Ganti PIN Admin
+        </h3>
+        <button onclick="closeChangePinModal()" class="text-slate-400 hover:text-slate-600 text-sm">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="changePinForm" onsubmit="handleChangePin(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">PIN Lama *</label>
+          <input type="password" id="oldPinInput" required placeholder="PIN saat ini" 
+                 class="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">PIN Baru *</label>
+          <input type="password" id="newPinInput" required minlength="4" placeholder="PIN baru (min 4 karakter)" 
+                 class="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600">
+        </div>
+
+        <div id="pinMsg" class="hidden text-xs p-2 rounded-lg"></div>
+
+        <button type="submit" id="savePinBtn" class="w-full bg-slate-900 hover:bg-black text-white font-semibold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2">
+          <i class="fa-solid fa-save"></i> Simpan PIN Baru
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-400 mt-auto">
+    <p>&copy; 2026 Panel Admin &bull; Powered by <a href="https://buatdigital.id" target="_blank" class="text-blue-600 font-semibold hover:underline">BuatDigital.id</a></p>
+  </footer>
+
+  <script>
+    let allLicenses = [];
+
+    // Verify Admin Auth on load
+    function getAdminToken() {
+      return localStorage.getItem('adminToken');
+    }
+
+    if (!getAdminToken()) {
+      window.location.href = '/login';
+    }
+
+    async function loadLicenses() {
+      try {
+        const res = await fetch('/api/admin/licenses', {
+          headers: { 'x-admin-token': getAdminToken() }
+        });
+        if (res.status === 403) {
+          localStorage.removeItem('adminToken');
+          window.location.href = '/login';
+          return;
+        }
+        const data = await res.json();
+        allLicenses = data.licenses || [];
+        updateStats();
+        renderLicensesTable();
+      } catch (err) {
+        console.error('Error loading licenses:', err);
+      }
+    }
+
+    function updateStats() {
+      document.getElementById('statTotalLicenses').innerText = allLicenses.length;
+      document.getElementById('statActiveLicenses').innerText = allLicenses.filter(l => l.isActive).length;
+      document.getElementById('statOnlineDevices').innerText = allLicenses.filter(l => l.isOnline).length;
+    }
+
+    function renderLicensesTable() {
+      const tbody = document.getElementById('licensesTableBody');
+      const search = (document.getElementById('searchLicInput').value || '').toLowerCase().trim();
+
+      let filtered = allLicenses;
+      if (search) {
+        filtered = filtered.filter(l => 
+          l.email.toLowerCase().includes(search) || 
+          (l.name && l.name.toLowerCase().includes(search)) ||
+          (l.notes && l.notes.toLowerCase().includes(search))
+        );
+      }
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="text-center py-8 text-slate-400">
+              Tidak ada data lisensi yang sesuai.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(l => {
+        const statusBadge = l.isActive 
+          ? `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">Aktif</span>`
+          : `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 text-slate-600">Nonaktif</span>`;
+
+        const onlineBadge = l.isOnline 
+          ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-200">
+               <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span> 1 Device Online
+             </span>`
+          : `<span class="text-slate-400 text-[11px]">Offline</span>`;
+
+        const lastLogin = l.lastLoginAt 
+          ? `<div class="space-y-0.5">
+               <p class="font-medium text-slate-700">${new Date(l.lastLoginAt).toLocaleString('id-ID')}</p>
+               <p class="text-[10px] text-slate-400 truncate max-w-[160px]">${l.lastDeviceInfo || '-'}</p>
+             </div>`
+          : `<span class="text-slate-400">Belum pernah login</span>`;
+
+        return `
+          <tr class="hover:bg-slate-50 transition-colors">
+            <td class="px-4 py-3 font-medium text-slate-900">${l.email}</td>
+            <td class="px-4 py-3">
+              <p class="font-medium text-slate-800">${l.name || '-'}</p>
+              <p class="text-[10px] text-slate-400">${l.notes || '-'}</p>
+            </td>
+            <td class="px-3 py-3 text-center">${statusBadge}</td>
+            <td class="px-3 py-3 text-center">${onlineBadge}</td>
+            <td class="px-4 py-3">${lastLogin}</td>
+            <td class="px-3 py-3 text-center font-mono font-semibold">${l.loginCount || 0}x</td>
+            <td class="px-4 py-3 text-center">
+              <div class="flex items-center justify-center gap-1.5">
+                ${l.isOnline ? `
+                  <button onclick="forceLogoutLicense('${l.id}')" title="Keluarkan Sesi / Reset Device" class="p-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                  </button>
+                ` : ''}
+                <button onclick="toggleLicense('${l.id}')" title="${l.isActive ? 'Nonaktifkan Lisensi' : 'Aktifkan Lisensi'}" class="p-1.5 rounded-lg ${l.isActive ? 'bg-slate-100 hover:bg-slate-200 text-slate-700' : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700'} border border-slate-200">
+                  <i class="fa-solid ${l.isActive ? 'fa-ban' : 'fa-check'}"></i>
+                </button>
+                <button onclick="deleteLicense('${l.id}', '${l.email}')" title="Hapus Lisensi" class="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function handleAddLicense(e) {
+      e.preventDefault();
+      const email = document.getElementById('newEmailInput').value.trim();
+      const name = document.getElementById('newNameInput').value.trim();
+      const notes = document.getElementById('newNotesInput').value.trim();
+      const btn = document.getElementById('addLicBtn');
+
+      btn.disabled = true;
+      try {
+        const res = await fetch('/api/admin/licenses', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-admin-token': getAdminToken()
+          },
+          body: JSON.stringify({ email, name, notes })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Gagal menambahkan lisensi');
+
+        document.getElementById('newEmailInput').value = '';
+        document.getElementById('newNameInput').value = '';
+        document.getElementById('newNotesInput').value = '';
+        alert(`Lisensi untuk ${email} berhasil didaftarkan!`);
+        loadLicenses();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    async function toggleLicense(id) {
+      try {
+        const res = await fetch(`/api/admin/licenses/${id}/toggle`, {
+          method: 'PUT',
+          headers: { 'x-admin-token': getAdminToken() }
+        });
+        if (!res.ok) throw new Error('Gagal mengubah status');
+        loadLicenses();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    async function forceLogoutLicense(id) {
+      if (confirm('Keluarkan sesi aktif lisensi ini dari perangkat yang sedang digunakan?')) {
+        try {
+          const res = await fetch(`/api/admin/licenses/${id}/logout`, {
+            method: 'POST',
+            headers: { 'x-admin-token': getAdminToken() }
+          });
+          if (!res.ok) throw new Error('Gagal mereset sesi');
+          loadLicenses();
+        } catch (err) {
+          alert('Error: ' + err.message);
+        }
+      }
+    }
+
+    async function deleteLicense(id, email) {
+      if (confirm(`Apakah Anda yakin ingin menghapus lisensi ${email}?`)) {
+        try {
+          const res = await fetch(`/api/admin/licenses/${id}`, {
+            method: 'DELETE',
+            headers: { 'x-admin-token': getAdminToken() }
+          });
+          if (!res.ok) throw new Error('Gagal menghapus lisensi');
+          loadLicenses();
+        } catch (err) {
+          alert('Error: ' + err.message);
+        }
+      }
+    }
+
+    function openChangePinModal() {
+      document.getElementById('pinModal').classList.remove('hidden');
+    }
+    function closeChangePinModal() {
+      document.getElementById('pinModal').classList.add('hidden');
+      document.getElementById('oldPinInput').value = '';
+      document.getElementById('newPinInput').value = '';
+      document.getElementById('pinMsg').classList.add('hidden');
+    }
+
+    async function handleChangePin(e) {
+      e.preventDefault();
+      const oldPin = document.getElementById('oldPinInput').value;
+      const newPin = document.getElementById('newPinInput').value;
+      const msg = document.getElementById('pinMsg');
+
+      try {
+        const res = await fetch('/api/admin/change-pin', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-admin-token': getAdminToken()
+          },
+          body: JSON.stringify({ oldPin, newPin })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Gagal mengganti PIN');
+
+        msg.className = 'text-xs p-2 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 block';
+        msg.innerText = data.message;
+        setTimeout(() => closeChangePinModal(), 1500);
+      } catch (err) {
+        msg.className = 'text-xs p-2 rounded-lg bg-rose-50 text-rose-700 border border-rose-200 block';
+        msg.innerText = err.message;
+      }
+    }
+
+    function adminLogout() {
+      localStorage.removeItem('adminToken');
+      window.location.href = '/login';
+    }
+
+    window.addEventListener('DOMContentLoaded', loadLicenses);
+  </script>
+</body>
+</html>
