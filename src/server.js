@@ -33,13 +33,13 @@ const PORT = process.env.PORT || 3003;
 
 app.disable('x-powered-by');
 
-app.use(
-  helmet({
-    contentSecurityPolicy: false,
-    crossOriginEmbedderPolicy: false,
-    referrerPolicy: { policy: 'strict-origin-when-cross-origin' }
-  })
-);
+// Permissive headers to ensure zero script blocking on mobile/extensions
+app.use((req, res, next) => {
+  res.removeHeader('Content-Security-Policy');
+  res.removeHeader('X-Content-Security-Policy');
+  res.removeHeader('X-WebKit-CSP');
+  next();
+});
 
 // Setup upload storage in memory with size limit
 const upload = multer({
