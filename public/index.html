@@ -33,8 +33,11 @@
           </div>
         </div>
 
-        <!-- Mobile Quick Logout (Only visible on tiny screens if needed) -->
+        <!-- Mobile Quick Logout & Admin Button -->
         <div class="flex sm:hidden items-center gap-1.5">
+          <a href="/admin" title="Panel Admin" class="p-1.5 rounded-lg bg-slate-800/60 text-amber-300 border border-slate-700 text-xs">
+            <i class="fa-solid fa-shield-halved"></i>
+          </a>
           <button onclick="userLogout()" title="Logout" class="p-1.5 rounded-lg bg-rose-600/30 text-rose-200 hover:text-white border border-rose-500/40 text-xs">
             <i class="fa-solid fa-power-off"></i>
           </button>
@@ -42,7 +45,10 @@
       </div>
 
       <!-- User Account & Actions -->
-      <div class="hidden sm:flex items-center space-x-2.5 text-xs flex-shrink-0">
+      <div class="hidden sm:flex items-center space-x-2 text-xs flex-shrink-0">
+        <a href="/admin" title="Panel Admin" class="px-2.5 py-1.5 rounded-xl bg-slate-800/60 hover:bg-slate-800 text-amber-300 border border-slate-700 transition-all flex items-center gap-1.5 font-medium">
+          <i class="fa-solid fa-shield-halved text-xs"></i> <span>Admin</span>
+        </a>
         <div id="userAccountInfo" class="flex items-center gap-2 bg-blue-950/70 px-3 py-1.5 rounded-xl border border-blue-800/80 max-w-[200px] lg:max-w-none">
           <i class="fa-solid fa-circle-user text-blue-300 text-sm flex-shrink-0"></i>
           <span id="userEmailBadge" class="font-medium text-slate-200 truncate">user@email.com</span>
