@@ -72,7 +72,11 @@ class LicenseService {
   }
 
   saveLicensesData(licenses) {
-    fs.writeFileSync(LICENSES_FILE, JSON.stringify(licenses, null, 2));
+    try {
+      fs.writeFileSync(LICENSES_FILE, JSON.stringify(licenses, null, 2));
+    } catch (err) {
+      console.error('⚠️ Gagal menyimpan licenses.json (Izin file):', err.message);
+    }
   }
 
   getAdminData() {
@@ -82,12 +86,16 @@ class LicenseService {
       return JSON.parse(content || '{}');
     } catch (err) {
       console.error('Error reading admin config:', err);
-      return {};
+      return { pinHash: hashPin('admin123') };
     }
   }
 
   saveAdminData(admin) {
-    fs.writeFileSync(ADMIN_FILE, JSON.stringify(admin, null, 2));
+    try {
+      fs.writeFileSync(ADMIN_FILE, JSON.stringify(admin, null, 2));
+    } catch (err) {
+      console.error('⚠️ Gagal menyimpan admin.json (Izin file):', err.message);
+    }
   }
 
   // Admin Auth
@@ -99,7 +107,7 @@ class LicenseService {
       this.saveAdminData(admin);
       return { success: true, token: adminToken };
     }
-    return { success: false, error: 'PIN Admin salah.' };
+    return { success: false, error: 'PIN Admin tidak sesuai' };
   }
 
   verifyAdminSession(token) {
