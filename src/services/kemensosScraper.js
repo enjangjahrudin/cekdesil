@@ -60,11 +60,21 @@ class CookieJar {
 function parseResultHtml(html, nik) {
   const $ = cheerio.load(html);
 
-  // Check if response contains table
-  const table = $('table');
-  const dtsenBadge = $('span:contains("DTSEN"), .badge:contains("DTSEN"), h5:contains("DTSEN"), div:contains("DTSEN")').text().trim();
-  const periodMatch = html.match(/DTSEN\s+TRIWULAN\s+\d+\s+\d{4}/i);
-  const dtsenPeriod = periodMatch ? periodMatch[0] : (dtsenBadge || 'DTSEN');
+  // Extract DTSEN Period header (e.g. DTSEN TRIWULAN 3.1 2026)
+  const periodMatch = html.match(/DTSEN\s+TRIWULAN\s+[\d.]+\s+\d{4}/i) || 
+                      html.match(/TRIWULAN\s+[\d.]+\s+\d{4}/i) ||
+                      html.match(/DTSEN[^\n\r<]{1,40}/i);
+
+  let dtsenPeriod = 'DTSEN';
+  if (periodMatch) {
+    dtsenPeriod = periodMatch[0].trim();
+  } else {
+    const smallBadge = $('span, badge, h4, h5, h6, b, strong').filter((_, el) => {
+      const txt = $(el).text().trim();
+      return txt.includes('DTSEN') && txt.length > 0 && txt.length <= 40;
+    }).first().text().trim();
+    if (smallBadge) dtsenPeriod = smallBadge;
+  }
 
   // Check if table exists
   if (table.length > 0) {
