@@ -77,6 +77,7 @@ function parseResultHtml(html, nik) {
   }
 
   // Check if table exists
+  const table = $('table');
   if (table.length > 0) {
     const rows = $('tbody tr');
     let matchedRow = rows.first();
