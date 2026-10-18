@@ -24,5 +24,31 @@
     "lastDeviceInfo": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36 Edg/151.0.0.0",
     "lastIp": "::1",
     "loginCount": 2
+  },
+  {
+    "id": "025bfc62-c0ad-4b27-867f-96b5b637100a",
+    "email": "ahmad@example.com",
+    "name": "Ahmad Dahlan",
+    "isActive": true,
+    "createdAt": "2026-10-18T09:53:15.323Z",
+    "notes": "Auto-activated via Syahaja Pay Order #BD-1792317185945-124",
+    "activeSessionToken": null,
+    "lastLoginAt": null,
+    "lastDeviceInfo": null,
+    "lastIp": null,
+    "loginCount": 0
+  },
+  {
+    "id": "e10b5557-d29e-4c9b-b947-d12c872d2f3f",
+    "email": "artness.design@gmail.com",
+    "name": "Artness Design",
+    "isActive": true,
+    "createdAt": "2026-10-18T10:35:56.402Z",
+    "notes": "Pembelian via Syahaja Pay BuatDigital.id",
+    "activeSessionToken": null,
+    "lastLoginAt": null,
+    "lastDeviceInfo": null,
+    "lastIp": null,
+    "loginCount": 0
   }
 ]
